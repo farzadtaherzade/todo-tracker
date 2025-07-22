@@ -1,7 +1,7 @@
 from .models import Profile, Friend
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status, generics
+from rest_framework import status, generics, serializers
 from .serializers import ProfileSerializer, FriendSerializer, FriendSerializerAnswer, UserSerializer
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
@@ -45,33 +45,38 @@ class SendAndListFriendRequests(generics.ListCreateAPIView):
         receiver = self.request.data.get("receiver")
 
         if int(receiver) == self.request.user.id:
-            return serializer.ValidateError("You can't send friend request to yourself")
+            raise serializers.ValidationError(
+                "You can't send friend request to yourself")
 
-        if Friend.objects.filter(receiver_id=receiver, sender=self.request.user).exists():
-            return serializer.ValidateError("Friend alread exists")
+        if Friend.objects.filter(receiver_id=int(receiver), sender=self.request.user).exists():
+            raise serializers.ValidationError("Friend alread exists")
+
+        return serializer.save(sender=self.request.user)
 
     def get_queryset(self):
         return Friend.objects.filter(sender=self.request.user)
 
 
-@api_view(["POST"])
+@api_view(["POST", "GET"])
 def accept_or_reject_friend_request(request, friend_pk):
     try:
         friend = Friend.objects.get(pk=friend_pk, receiver=request.user)
     except Friend.DoesNotExist:
         return Response(data={"message": "not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    serializer = FriendSerializerAnswer(data=request.data)
-    if serializer.is_valid:
-        if serializer.answer == True:
-            friend.status = 2
-        else:
-            friend.status = 3
-        friend.save()
-
-        friend_serializer = FriendSerializer(friend)
-        return Response(data={"friend_request": friend_serializer.data}, status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+    if request.method == "POST":
+        answer_serializer = FriendSerializerAnswer(data=request.data)
+        if answer_serializer.is_valid():
+            new_status = 2 if answer_serializer.validated_data.get(
+                "answer") else 3
+            friend.status = new_status
+            friend.save()
+            serializer = FriendSerializer(friend)
+            return Response(serializer.data)
+        return Response(answer_serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+    else:
+        serializer = FriendSerializer(friend)
+        return Response(serializer.data)
 
 
 class ListRreceivedFriendRequest(generics.ListAPIView):

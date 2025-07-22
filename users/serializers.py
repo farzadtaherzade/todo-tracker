@@ -37,4 +37,4 @@ class FriendSerializer(serializers.ModelSerializer):
 
 
 class FriendSerializerAnswer(serializers.Serializer):
-    answer = serializers.BooleanField(default=True)
+    answer = serializers.BooleanField()
