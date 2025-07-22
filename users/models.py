@@ -16,3 +16,21 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} Profile"
+
+
+class Friend(models.Model):
+    STATUS_CHOICES = (
+        (1, "Pending"),
+        (2, "Accepted"),
+        (3, "Rejected")
+    )
+
+    sender = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="send_requests")
+    receiver = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="received_requests")
+    status = models.BigIntegerField(choices=STATUS_CHOICES, default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("sender", "receiver")

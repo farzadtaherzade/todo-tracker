@@ -1,4 +1,4 @@
-from .models import Profile
+from .models import Profile, Friend
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -27,3 +27,14 @@ class ProfileSerializer(serializers.ModelSerializer):
                 setattr(instance.user, attr, value)
             instance.user.save()
         return super().update(instance, validated_data)
+
+
+class FriendSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Friend
+        fields = "__all__"
+        read_only_fields = ("sender", "status", "created_at")
+
+
+class FriendSerializerAnswer(serializers.Serializer):
+    answer = serializers.BooleanField(default=True)
