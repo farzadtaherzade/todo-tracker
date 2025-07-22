@@ -7,6 +7,13 @@ User = get_user_model()
 
 
 class Todo(models.Model):
+    PRIORITY_CHOICES = (
+        (1, "Priority 1",),
+        (2, "Priority 2",),
+        (3, "Priority 3",),
+        (4, "Priority 4",),
+    )
+
     title = models.CharField(max_length=255)
     description = models.TextField(max_length=500)
 
@@ -14,6 +21,7 @@ class Todo(models.Model):
     is_completed = models.BooleanField(default=False)
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="todos")
+    priority = models.IntegerField(choices=PRIORITY_CHOICES, default=1)
     photo = models.ImageField(
         upload_to='todo_photos/', null=True, blank=True, default='todo_photos')
     watcher = models.ForeignKey(

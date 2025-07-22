@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     # first party
     "todo.apps.TodoConfig",
+    "users.apps.UsersConfig",
 ]
 
 REST_FRAMEWORK = {
