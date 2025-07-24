@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from projects.models import Project
 
 # Create your models here.
 
@@ -27,6 +28,8 @@ class Todo(models.Model):
     watcher = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="watching_todos", null=True,
         blank=True, help_text="A friends or a family member can watch you do your todo and approve!")
+    projects = models.ForeignKey(
+        Project, on_delete=models.CASCADE, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
