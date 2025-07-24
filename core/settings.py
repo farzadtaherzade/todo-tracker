@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # first party
     "todo.apps.TodoConfig",
     "users.apps.UsersConfig",
+    'projects.apps.ProjectsConfig',
 
     # third party
     "rest_framework",
