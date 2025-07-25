@@ -31,3 +31,41 @@ def send_deadline_email(todo_pk):
         )
     except Todo.DoesNotExist:
         return f"Todo with id -- {todo_pk} -- not does not exists"
+
+
+@shared_task
+def send_watcher_notification_email(watcher_email, watcher_username, todo_title, todo_description):
+    subject = '📌 You have been assigned to a new task!'
+    message = (
+        f'Hello {watcher_username},\n\n'
+        f'You have been assigned to watch the following task:\n'
+        f'Title: {todo_title}\n'
+        f'Description: {todo_description}'
+    )
+    send_mail(
+        subject=subject,
+        message=message,
+        from_email='noreply@yourapp.com',
+        recipient_list=[watcher_email],
+        fail_silently=True,
+    )
+
+    return f'You have been assigned to watch the following task:\n'
+
+
+@shared_task
+def notify_task_completed_to_watcher(watcher_email, watcher_username, todo_title, owner_username):
+    subject = '✅ Task Completed — Please Review'
+    message = (
+        f"Hello {watcher_username},\n\n"
+        f"The task titled \"{todo_title}\" was marked as completed by {owner_username}.\n"
+        f"Please review and confirm the task if everything is correct.\n\n"
+        f"Thank you!"
+    )
+    send_mail(
+        subject=subject,
+        message=message,
+        from_email='noreply@yourapp.com',
+        recipient_list=[watcher_email],
+        fail_silently=True,
+    )
