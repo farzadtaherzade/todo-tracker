@@ -13,7 +13,7 @@ def notif_user_assigned_watcher(sender, instance, created, **kwargs):
             watcher_email=instance.watcher.email,
             watcher_username=instance.watcher.username,
             todo_title=instance.title,
-            owner_username=instance.user.username,
+            todo_description=instance.description,
         )
 
 
@@ -26,7 +26,7 @@ def notif_watcher_todo_completed(sender, instance: Todo, **kwargs):
                 watcher_email=instance.watcher.email,
                 watcher_username=instance.watcher.username,
                 todo_title=instance.title,
-                owner_username=instance.user.username,
+                owner_username=instance.owner.username,
             )
     except Todo.DoesNotExist:
         pass

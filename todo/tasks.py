@@ -18,7 +18,7 @@ def send_deadline_email(todo_pk):
     try:
         todo = Todo.objects.get(pk=todo_pk)
         subject = f"Deadline Reached for ToDo: {todo.title}"
-        message = f"Dear User,\n\nThe deadline for the ToDo '{todo.title}' has been reached.\n\nDetails:\n- Description: {todo.description}\n- Deadline: {todo.deadline}\n\nPlease take appropriate action.\n\nBest regards,\nYour ToDo App"
+        message = f"Dear User,\n\nThe deadline for the ToDo '{todo.title}' has been reached.\n\nDetails:\n- Description: {todo.description}\n- Deadline: {todo.dead_line}\n\nPlease take appropriate action.\n\nBest regards,\nYour ToDo App"
         from_email = settings.DEFAULT_FROM_EMAIL
         recipient_list = [todo.watcher.email, todo.owner.email]
 
