@@ -38,3 +38,7 @@ class FriendSerializer(serializers.ModelSerializer):
 
 class FriendSerializerAnswer(serializers.Serializer):
     answer = serializers.BooleanField()
+
+
+class SetUsernameSerializer(serializers.Serializer):
+    username = serializers.SlugField(write_only=True)

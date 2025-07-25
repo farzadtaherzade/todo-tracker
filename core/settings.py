@@ -46,14 +46,16 @@ INSTALLED_APPS = [
 
     # third party
     "rest_framework",
-    "django_celery_beat"
+    "rest_framework.authtoken",
+    "django_celery_beat",
+    "drfpasswordless",
+
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-
 }
 
 MIDDLEWARE = [
@@ -152,9 +154,20 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # Email configuration for SMTP4Dev
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
+EMAIL_PORT = 2525
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = 'noreply@todo.com'
+
+# password less auth config
+
+PASSWORDLESS_AUTH = {
+    'PASSWORDLESS_AUTH_TYPES': ['EMAIL'],
+    'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': DEFAULT_FROM_EMAIL,
+    'PASSWORDLESS_EMAIL_SUBJECT': 'Your Login Token',
+    'PASSWORDLESS_EMAIL_PLAINTEXT_MESSAGE': 'Enter this token to sign in: %s',
+    'PASSWORDLESS_EMAIL_TOKEN_HTML_TEMPLATE_NAME': 'passwordless_default_token_email.html',
+    'PASSWORDLESS_TEST_SUPPRESSION': False,
+}

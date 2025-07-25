@@ -2,9 +2,13 @@ from .models import Profile, Friend
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status, generics, serializers
-from .serializers import ProfileSerializer, FriendSerializer, FriendSerializerAnswer, UserSerializer
+from .serializers import ProfileSerializer, FriendSerializer, FriendSerializerAnswer, UserSerializer, SetUsernameSerializer
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
 
 
 class RetrieveUpdateProfileView(generics.GenericAPIView):
@@ -95,3 +99,26 @@ def saerch_username(request, username):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response(data={"message": "User Does Not Found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class SetUsernameView(generics.GenericAPIView):
+    queryset = User
+    serializer_class = SetUsernameSerializer
+
+    def post(self, request):
+        serializer = SetUsernameSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data["username"]
+
+            if not User.objects.filter(username=username).exists():
+                request.user.username = username
+                request.user.save()
+
+                return Response({"message": "Username set successfully"}, status=status.HTTP_200_OK)
+
+            return Response({"message": "Username already in use."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request):
+        return Response({"username": request.user.username})

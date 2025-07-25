@@ -8,6 +8,8 @@ djangorestframework = "*"
 pillow = "*"
 celery = {extras = ["redis"], version = "*"}
 django-celery-beat = "*"
+django-rest-authemail = "*"
+drfpasswordless = "*"
 
 [dev-packages]
 
