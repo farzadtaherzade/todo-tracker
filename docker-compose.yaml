@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - smtp
+
+  celery-worker:
+    build: .
+    command: celery -A todo_app worker --loglevel=info  # Replace 'todo_app' with your Django project name
+    volumes:
+      - .:/app
+    depends_on:
+      - app
+      - db
+      - smtp
+
+  celery-beat:
+    build: .
+    command: celery -A todo_app beat --loglevel=info  # Replace 'todo_app' with your Django project name
+    volumes:
+      - .:/app
+    depends_on:
+      - app
+      - db
+      - smtp
+
+  smtp:
+    image: docker.io/rnwood/smtp4dev:latest  # Fully qualified
+    container_name: smtp4dev
+    ports:
+      - "8025:80"    # Web UI
+      - "1025:25"    # SMTP Port
+    restart: unless-stopped
