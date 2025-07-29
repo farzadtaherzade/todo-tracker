@@ -9,33 +9,50 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
-      - smtp
+      - redis
+      - smtp4dev
+    env_file:
+      - .env
 
   celery-worker:
     build: .
-    command: celery -A todo_app worker --loglevel=info  # Replace 'todo_app' with your Django project name
+    command: celery -A core worker --loglevel=info
     volumes:
       - .:/app
     depends_on:
       - app
-      - db
-      - smtp
+      - redis
+      - smtp4dev
+    env_file:
+      - .env
 
   celery-beat:
     build: .
-    command: celery -A todo_app beat --loglevel=info  # Replace 'todo_app' with your Django project name
+    command: celery -A core beat --loglevel=info
     volumes:
       - .:/app
     depends_on:
       - app
-      - db
-      - smtp
+      - redis
+      - smtp4dev
+    env_file:
+      - .env
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
 
   smtp:
-    image: docker.io/rnwood/smtp4dev:latest  # Fully qualified
+    image: rnwood/smtp4dev:latest
     container_name: smtp4dev
     ports:
       - "8025:80"    # Web UI
       - "1025:25"    # SMTP Port
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 5s
+      timeout: 30s
+      retries: 3
     restart: unless-stopped
